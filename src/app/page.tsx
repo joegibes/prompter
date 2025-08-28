@@ -156,7 +156,7 @@ export default function HomePage() {
       <div style={slideContainerStyle}>
         <img
           src={slide.src}
-          alt={history[lightboxIndex]?.prompt}
+          alt={history[index]?.prompt}
           style={slideImageStyle}
         />
         <div
