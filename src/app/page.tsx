@@ -1,6 +1,14 @@
 "use client";
 
-import { useEffect, useState, useRef, FormEvent, ChangeEvent } from "react";
+import {
+  useEffect,
+  useState,
+  useRef,
+  FormEvent,
+  ChangeEvent,
+  CSSProperties,
+  KeyboardEvent,
+} from "react";
 import {
   Card,
   CardContent,
@@ -22,6 +30,54 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Loader2, PlusCircle } from "lucide-react";
 import Lightbox from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/styles.css";
+
+const slideContainerStyle: CSSProperties = {
+  position: "relative",
+  width: "100%",
+  height: "100%",
+  display: "flex",
+  flexDirection: "column",
+};
+
+const slideImageStyle: CSSProperties = {
+  display: "block",
+  width: "100%",
+  height: "100%",
+  objectFit: "contain",
+  flex: 1,
+};
+
+const captionContainerStyle: CSSProperties = {
+  width: "100%",
+  boxSizing: "border-box",
+  textAlign: "center",
+  backgroundColor: "rgba(0, 0, 0, .7)",
+  color: "#fff",
+  padding: "10px",
+  cursor: "pointer",
+  overflow: "hidden",
+  position: "relative",
+};
+
+const captionTextStyle: CSSProperties = {
+  whiteSpace: "pre-wrap",
+};
+
+const captionGradientStyle: CSSProperties = {
+  position: "absolute",
+  bottom: 0,
+  left: 0,
+  width: "100%",
+  height: "1.5em",
+  background:
+    "linear-gradient(to top, rgba(0,0,0,0.7), rgba(0,0,0,0))",
+};
+
+const moreTextStyle: CSSProperties = {
+  display: "block",
+  marginTop: "4px",
+  fontWeight: "bold",
+};
 
 interface HistoryItem {
   src: string;
@@ -72,6 +128,18 @@ export default function HomePage() {
         }
     }
   }, [messages]);
+
+  const toggleCaption = () =>
+    setIsCaptionExpanded((prev) => !prev);
+
+  const handleCaptionKeyDown = (
+    event: KeyboardEvent<HTMLDivElement>
+  ) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      toggleCaption();
+    }
+  };
 
   const handleGenerateImage = async () => {
     if (!finalPrompt) {
@@ -174,18 +242,30 @@ export default function HomePage() {
             </CardHeader>
             <CardContent className="flex-grow flex flex-col gap-4 overflow-hidden">
               <ScrollArea className="flex-grow p-4 border rounded-lg" ref={scrollAreaRef}>
-                {messages.map((m) => (
-                  <div
-                    key={m.id}
-                    className={`flex mb-3 ${m.role === "user" ? "justify-end" : "justify-start"}`}
-                  >
+                {messages.length === 0 ? (
+                  <p className="text-sm text-muted-foreground text-center">
+                    No messages yet.
+                  </p>
+                ) : (
+                  messages.map((m) => (
                     <div
-                      className={`p-3 rounded-lg max-w-md ${m.role === "user" ? "bg-primary/20 text-primary" : "bg-secondary/50 text-secondary-foreground"}`}
+                      key={m.id}
+                      className={`flex mb-3 ${
+                        m.role === "user" ? "justify-end" : "justify-start"
+                      }`}
                     >
-                      {m.content}
+                      <div
+                        className={`p-3 rounded-lg max-w-md ${
+                          m.role === "user"
+                            ? "bg-primary/20 text-primary"
+                            : "bg-secondary/50 text-secondary-foreground"
+                        }`}
+                      >
+                        {m.content}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))
+                )}
               </ScrollArea>
               <form onSubmit={handleSubmit} className="flex gap-2">
                 <Input
@@ -280,68 +360,30 @@ export default function HomePage() {
         carousel={{ finite: true }}
         render={{
           slide: ({ slide }) => (
-            <div
-              style={{
-                position: "relative",
-                width: "100%",
-                height: "100%",
-                display: "flex",
-                flexDirection: "column",
-              }}
-            >
+            <div style={slideContainerStyle}>
               <img
                 src={slide.src}
-                alt=""
-                style={{
-                  display: "block",
-                  width: "100%",
-                  height: "100%",
-                  objectFit: "contain",
-                  flex: 1,
-                }}
+                alt={history[lightboxIndex]?.prompt}
+                style={slideImageStyle}
               />
               <div
-                onClick={() => setIsCaptionExpanded(!isCaptionExpanded)}
-                style={{
-                  width: "100%",
-                  boxSizing: "border-box",
-                  textAlign: "center",
-                  backgroundColor: "rgba(0, 0, 0, .7)",
-                  color: "#fff",
-                  padding: "10px",
-                  cursor: "pointer",
-                  overflow: "hidden",
-                  position: "relative",
-                  ...(isCaptionExpanded
-                    ? {}
-                    : { maxHeight: "4.5em" }),
-                }}
+                role="button"
+                tabIndex={0}
+                onClick={toggleCaption}
+                onKeyDown={handleCaptionKeyDown}
+                style={
+                  isCaptionExpanded
+                    ? captionContainerStyle
+                    : { ...captionContainerStyle, maxHeight: "4.5em" }
+                }
               >
-                <span style={{ whiteSpace: "pre-wrap" }}>
+                <span style={captionTextStyle}>
                   {history[lightboxIndex]?.prompt}
                 </span>
                 {!isCaptionExpanded && (
                   <>
-                    <div
-                      style={{
-                        position: "absolute",
-                        bottom: 0,
-                        left: 0,
-                        width: "100%",
-                        height: "1.5em",
-                        background:
-                          "linear-gradient(to top, rgba(0,0,0,0.7), rgba(0,0,0,0))",
-                      }}
-                    />
-                    <span
-                      style={{
-                        display: "block",
-                        marginTop: "4px",
-                        fontWeight: "bold",
-                      }}
-                    >
-                      more...
-                    </span>
+                    <div style={captionGradientStyle} />
+                    <span style={moreTextStyle}>more...</span>
                   </>
                 )}
               </div>
