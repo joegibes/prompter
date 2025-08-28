@@ -51,6 +51,7 @@ export default function HomePage() {
   // History and lightbox state
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [lightboxIndex, setLightboxIndex] = useState(-1);
+  const [isCaptionExpanded, setIsCaptionExpanded] = useState(false);
 
   useEffect(() => {
     const lastMessage = messages[messages.length - 1];
@@ -58,6 +59,10 @@ export default function HomePage() {
       setFinalPrompt(lastMessage.content);
     }
   }, [messages, isChatLoading]);
+
+  useEffect(() => {
+    setIsCaptionExpanded(false);
+  }, [lightboxIndex]);
 
   useEffect(() => {
     if (scrollAreaRef.current) {
@@ -154,13 +159,13 @@ export default function HomePage() {
           <h1 className="text-2xl font-serif text-amber-400">
             Nano Banana Prompter
           </h1>
-          <Button variant="ghost" onClick={handleNewCreation}>
+          <Button variant="secondary" onClick={handleNewCreation}>
             <PlusCircle className="mr-2 h-4 w-4" />
             New Creation
           </Button>
         </header>
 
-        <main className="flex-grow grid md:grid-cols-2 gap-4 p-4 overflow-hidden">
+        <main className="flex-grow grid grid-cols-1 md:grid-cols-2 gap-4 p-4 md:overflow-hidden">
           {/* Left Panel: Chat */}
           <Card className="flex flex-col">
             <CardHeader>
@@ -169,17 +174,29 @@ export default function HomePage() {
             </CardHeader>
             <CardContent className="flex-grow flex flex-col gap-4 overflow-hidden">
               <ScrollArea className="flex-grow p-4 border rounded-lg" ref={scrollAreaRef}>
-                {messages.length > 0 ? messages.map((m) => (
-                  <div key={m.id} className={`flex mb-3 ${m.role === "user" ? "justify-end" : "justify-start"}`}>
-                    <div className={`p-3 rounded-lg max-w-md ${m.role === "user" ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground"}`}>
+                {messages.map((m) => (
+                  <div
+                    key={m.id}
+                    className={`flex mb-3 ${m.role === "user" ? "justify-end" : "justify-start"}`}
+                  >
+                    <div
+                      className={`p-3 rounded-lg max-w-md ${m.role === "user" ? "bg-primary/20 text-primary" : "bg-secondary/50 text-secondary-foreground"}`}
+                    >
                       {m.content}
                     </div>
                   </div>
-                )) : <p className="text-sm text-muted-foreground">Chat history is empty. Start by typing your idea below.</p>}
+                ))}
               </ScrollArea>
               <form onSubmit={handleSubmit} className="flex gap-2">
-                <Input value={input} onChange={handleInputChange} placeholder="Type your idea..." disabled={isChatLoading} />
-                <Button type="submit" disabled={isChatLoading}>Send</Button>
+                <Input
+                  value={input}
+                  onChange={handleInputChange}
+                  placeholder="Type your idea..."
+                  disabled={isChatLoading}
+                />
+                <Button type="submit" variant="secondary" disabled={isChatLoading}>
+                  Send
+                </Button>
               </form>
             </CardContent>
           </Card>
@@ -195,9 +212,17 @@ export default function HomePage() {
                 {isGenerating ? (
                   <Loader2 className="h-12 w-12 animate-spin text-primary" />
                 ) : generatedImageUrl ? (
-                  <img src={generatedImageUrl} alt="Generated image" className="object-contain w-full h-full rounded-lg" />
+                  <img
+                    src={generatedImageUrl}
+                    alt="Generated image"
+                    className="object-contain w-full h-full rounded-lg"
+                  />
                 ) : (
-                  <p className="text-muted-foreground">Your image will appear here</p>
+                  <img
+                    src="/placeholder.svg"
+                    alt="Placeholder"
+                    className="object-contain w-1/3 opacity-20"
+                  />
                 )}
               </div>
               {generationError && <p className="text-sm text-destructive">{generationError}</p>}
@@ -215,7 +240,12 @@ export default function HomePage() {
                     <SelectItem value="gemini-2.5-flash-image-preview">Gemini 2.5 Flash Image</SelectItem>
                   </SelectContent>
                 </Select>
-                <Button size="lg" onClick={handleGenerateImage} disabled={isGenerating || !finalPrompt}>
+                <Button
+                  size="lg"
+                  variant="secondary"
+                  onClick={handleGenerateImage}
+                  disabled={isGenerating || !finalPrompt}
+                >
                   {isGenerating ? "Generating..." : "Generate Image"}
                 </Button>
               </div>
@@ -244,42 +274,79 @@ export default function HomePage() {
         open={lightboxIndex >= 0}
         close={() => setLightboxIndex(-1)}
         index={lightboxIndex}
-        slides={history.map(item => ({ src: item.src }))}
+        slides={history.map((item) => ({ src: item.src }))}
         styles={{ container: { backgroundColor: "rgba(0, 0, 0, .9)" } }}
         animation={{ swipe: 0, fade: 0 }}
         carousel={{ finite: true }}
         render={{
-            slide: ({ slide }) => (
-                <div style={{ position: "relative", width: "100%", height: "100%" }}>
-                    <img
-                        src={slide.src}
-                        alt=""
-                        style={{
-                            display: "block",
-                            position: "absolute",
-                            left: 0,
-                            top: 0,
-                            width: "100%",
-                            height: "100%",
-                            objectFit: "contain"
-                        }}
-                    />
+          slide: ({ slide }) => (
+            <div
+              style={{
+                position: "relative",
+                width: "100%",
+                height: "100%",
+                display: "flex",
+                flexDirection: "column",
+              }}
+            >
+              <img
+                src={slide.src}
+                alt=""
+                style={{
+                  display: "block",
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "contain",
+                  flex: 1,
+                }}
+              />
+              <div
+                onClick={() => setIsCaptionExpanded(!isCaptionExpanded)}
+                style={{
+                  width: "100%",
+                  boxSizing: "border-box",
+                  textAlign: "center",
+                  backgroundColor: "rgba(0, 0, 0, .7)",
+                  color: "#fff",
+                  padding: "10px",
+                  cursor: "pointer",
+                  overflow: "hidden",
+                  position: "relative",
+                  ...(isCaptionExpanded
+                    ? {}
+                    : { maxHeight: "4.5em" }),
+                }}
+              >
+                <span style={{ whiteSpace: "pre-wrap" }}>
+                  {history[lightboxIndex]?.prompt}
+                </span>
+                {!isCaptionExpanded && (
+                  <>
                     <div
-                        style={{
-                            position: "absolute",
-                            bottom: 0,
-                            width: "100%",
-                            boxSizing: "border-box",
-                            textAlign: "center",
-                            backgroundColor: "rgba(0, 0, 0, .7)",
-                            color: "#fff",
-                            padding: "10px"
-                        }}
+                      style={{
+                        position: "absolute",
+                        bottom: 0,
+                        left: 0,
+                        width: "100%",
+                        height: "1.5em",
+                        background:
+                          "linear-gradient(to top, rgba(0,0,0,0.7), rgba(0,0,0,0))",
+                      }}
+                    />
+                    <span
+                      style={{
+                        display: "block",
+                        marginTop: "4px",
+                        fontWeight: "bold",
+                      }}
                     >
-                        {history[lightboxIndex]?.prompt}
-                    </div>
-                </div>
-            )
+                      more...
+                    </span>
+                  </>
+                )}
+              </div>
+            </div>
+          ),
         }}
       />
     </>
