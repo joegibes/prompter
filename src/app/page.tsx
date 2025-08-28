@@ -23,6 +23,33 @@ import { Loader2, PlusCircle } from "lucide-react";
 import Lightbox from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/styles.css";
 
+const slideContainerStyle: React.CSSProperties = {
+  position: "relative",
+  width: "100%",
+  height: "100%",
+};
+
+const slideImageStyle: React.CSSProperties = {
+  display: "block",
+  position: "absolute",
+  left: 0,
+  top: 0,
+  width: "100%",
+  height: "100%",
+  objectFit: "contain",
+};
+
+const slideCaptionStyle: React.CSSProperties = {
+  position: "absolute",
+  bottom: 0,
+  width: "100%",
+  boxSizing: "border-box",
+  textAlign: "center",
+  backgroundColor: "rgba(0, 0, 0, .7)",
+  color: "#fff",
+  padding: "10px",
+};
+
 interface HistoryItem {
   src: string;
   prompt: string;
@@ -249,37 +276,18 @@ export default function HomePage() {
         animation={{ swipe: 0, fade: 0 }}
         carousel={{ finite: true }}
         render={{
-            slide: ({ slide }) => (
-                <div style={{ position: "relative", width: "100%", height: "100%" }}>
-                    <img
-                        src={slide.src}
-                        alt=""
-                        style={{
-                            display: "block",
-                            position: "absolute",
-                            left: 0,
-                            top: 0,
-                            width: "100%",
-                            height: "100%",
-                            objectFit: "contain"
-                        }}
-                    />
-                    <div
-                        style={{
-                            position: "absolute",
-                            bottom: 0,
-                            width: "100%",
-                            boxSizing: "border-box",
-                            textAlign: "center",
-                            backgroundColor: "rgba(0, 0, 0, .7)",
-                            color: "#fff",
-                            padding: "10px"
-                        }}
-                    >
-                        {history[lightboxIndex]?.prompt}
-                    </div>
-                </div>
-            )
+          slide: ({ slide }) => (
+            <div style={slideContainerStyle}>
+              <img
+                src={slide.src}
+                alt=""
+                style={slideImageStyle}
+              />
+              <div style={slideCaptionStyle}>
+                {history[lightboxIndex]?.prompt}
+              </div>
+            </div>
+          )
         }}
       />
     </>
