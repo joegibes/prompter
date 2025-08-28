@@ -152,7 +152,7 @@ export default function HomePage() {
   );
 
   const renderSlide = useCallback(
-    ({ slide }: { slide: { src: string } }) => (
+    ({ slide, index }: { slide: { src: string }; index: number }) => (
       <div style={slideContainerStyle}>
         <img
           src={slide.src}
