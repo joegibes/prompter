@@ -280,7 +280,7 @@ export default function HomePage() {
             <div style={slideContainerStyle}>
               <img
                 src={slide.src}
-                alt=""
+                alt={history[lightboxIndex]?.prompt || 'Generated image'}
                 style={slideImageStyle}
               />
               <div style={slideCaptionStyle}>
