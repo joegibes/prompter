@@ -149,8 +149,8 @@ export default function HomePage() {
 
   return (
     <>
-      <div className="flex flex-col h-screen bg-background text-foreground">
-        <header className="p-4 border-b flex justify-between items-center">
+      <div className="flex flex-col min-h-screen bg-background text-foreground">
+        <header className="p-4 border-b flex justify-between items-center flex-shrink-0">
           <h1 className="text-2xl font-serif text-amber-400">
             Nano Banana Prompter
           </h1>
@@ -160,14 +160,14 @@ export default function HomePage() {
           </Button>
         </header>
 
-        <main className="flex-grow grid md:grid-cols-2 gap-4 p-4 overflow-hidden">
+        <main className="flex-grow flex flex-col md:flex-row gap-4 p-4 overflow-y-auto md:overflow-hidden">
           {/* Left Panel: Chat */}
-          <Card className="flex flex-col">
+          <Card className="flex flex-col md:w-1/2 h-full">
             <CardHeader>
               <CardTitle>Chat Assistant</CardTitle>
               <CardDescription>Refine your vision here.</CardDescription>
             </CardHeader>
-            <CardContent className="flex-grow flex flex-col gap-4 overflow-hidden">
+            <CardContent className="flex-grow flex flex-col gap-4">
               <ScrollArea className="flex-grow p-4 border rounded-lg" ref={scrollAreaRef}>
                 {messages.length > 0 ? messages.map((m) => (
                   <div key={m.id} className={`flex mb-3 ${m.role === "user" ? "justify-end" : "justify-start"}`}>
@@ -185,13 +185,13 @@ export default function HomePage() {
           </Card>
 
           {/* Right Panel: Creation */}
-          <Card className="flex flex-col">
+          <Card className="flex flex-col md:w-1/2 md:overflow-y-auto">
             <CardHeader>
               <CardTitle>Creation Canvas</CardTitle>
               <CardDescription>Your final prompt and generated image.</CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col gap-4">
-              <div className="aspect-square w-full bg-secondary rounded-lg flex items-center justify-center relative">
+              <div className="aspect-square w-full bg-secondary rounded-lg flex items-center justify-center relative flex-shrink-0">
                 {isGenerating ? (
                   <Loader2 className="h-12 w-12 animate-spin text-primary" />
                 ) : generatedImageUrl ? (
@@ -224,7 +224,7 @@ export default function HomePage() {
         </main>
 
         {/* Bottom Panel: History */}
-        <footer className="p-4 border-t">
+        <footer className="p-4 border-t flex-shrink-0">
           <h2 className="text-lg font-semibold mb-2">Generation History</h2>
           <div className="flex gap-4 overflow-x-auto pb-2">
             {history.map((item, index) => (
