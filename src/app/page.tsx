@@ -8,6 +8,7 @@ import {
   ChangeEvent,
   CSSProperties,
   KeyboardEvent,
+  useCallback,
 } from "react";
 import {
   Card,
@@ -134,17 +135,20 @@ export default function HomePage() {
     }
   }, [messages]);
 
-  const toggleCaption = () =>
-    setIsCaptionExpanded((prev) => !prev);
+  const toggleCaption = useCallback(
+    () => setIsCaptionExpanded((prev) => !prev),
+    []
+  );
 
-  const handleCaptionKeyDown = (
-    event: KeyboardEvent<HTMLDivElement>
-  ) => {
-    if (event.key === "Enter" || event.key === " ") {
-      event.preventDefault();
-      toggleCaption();
-    }
-  };
+  const handleCaptionKeyDown = useCallback(
+    (event: KeyboardEvent<HTMLDivElement>) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        toggleCaption();
+      }
+    },
+    [toggleCaption]
+  );
 
   const handleGenerateImage = async () => {
     if (!finalPrompt) {
@@ -380,7 +384,7 @@ export default function HomePage() {
                 style={
                   isCaptionExpanded
                     ? captionContainerStyle
-                    : { ...captionContainerStyle, maxHeight: "4.5em" }
+                    : collapsedCaptionContainerStyle
                 }
               >
                 <span style={captionTextStyle}>
