@@ -2,48 +2,48 @@
 
 @layer base {
   :root {
-    --background: 240 10% 3.9%;
+    --background: 240 5% 8%;
     --foreground: 0 0% 98%;
-    --card: 240 10% 3.9%;
+    --card: 240 5% 8%;
     --card-foreground: 0 0% 98%;
-    --popover: 240 10% 3.9%;
+    --popover: 240 5% 8%;
     --popover-foreground: 0 0% 98%;
     --primary: 34.9 91.6% 58.4%; /* Amber */
     --primary-foreground: 240 5.9% 10%;
-    --secondary: 240 3.7% 15.9%;
+    --secondary: 240 4% 18%;
     --secondary-foreground: 0 0% 98%;
-    --muted: 240 3.7% 15.9%;
+    --muted: 240 4% 18%;
     --muted-foreground: 240 5% 64.9%;
     --accent: 34.9 91.6% 58.4%; /* Amber */
     --accent-foreground: 240 5.9% 10%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
+    --border: 240 4% 18%;
+    --input: 240 4% 18%;
     --ring: 34.9 91.6% 58.4%; /* Amber */
-    --radius: 0.5rem;
+    --radius: 0.75rem;
   }
 
   .dark {
     /* This ensures dark mode is the default */
-    --background: 240 10% 3.9%;
+    --background: 240 5% 8%;
     --foreground: 0 0% 98%;
-    --card: 240 10% 3.9%;
+    --card: 240 5% 8%;
     --card-foreground: 0 0% 98%;
-    --popover: 240 10% 3.9%;
+    --popover: 240 5% 8%;
     --popover-foreground: 0 0% 98%;
     --primary: 34.9 91.6% 58.4%; /* Amber */
     --primary-foreground: 240 5.9% 10%;
-    --secondary: 240 3.7% 15.9%;
+    --secondary: 240 4% 18%;
     --secondary-foreground: 0 0% 98%;
-    --muted: 240 3.7% 15.9%;
+    --muted: 240 4% 18%;
     --muted-foreground: 240 5% 64.9%;
     --accent: 34.9 91.6% 58.4%; /* Amber */
     --accent-foreground: 240 5.9% 10%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
+    --border: 240 4% 18%;
+    --input: 240 4% 18%;
     --ring: 34.9 91.6% 58.4%; /* Amber */
   }
 }
