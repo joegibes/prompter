@@ -358,6 +358,7 @@ export default function HomePage() {
         styles={{ container: { backgroundColor: "rgba(0, 0, 0, .9)" } }}
         animation={{ swipe: 0, fade: 0 }}
         carousel={{ finite: true }}
+        controller={{ touchAction: "pan-y" }}
         render={{
           slide: ({ slide }) => (
             <div style={slideContainerStyle}>
