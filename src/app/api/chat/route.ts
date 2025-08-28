@@ -1,13 +1,13 @@
 import {
-  GoogleGenerativeAI,
+  GoogleGenAI,
   HarmCategory,
   HarmBlockThreshold,
-} from "@google/generative-ai";
+} from "@google/genai";
 import { GoogleAIStream, StreamingTextResponse } from "ai";
 
 export const runtime = "edge";
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
+const genAI = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 const promptTemplate = `You are a creative partner that helps the user enhance their prompts following Google's templates, guidelines and docs for using the Gemini 2.5 Flash image model. It helps take a basic prompt and add things like scene camera, angle, lighting, mode, photograph, look, etc. this will only be used for different kinds of photographic prompts. Never for any other art style.
 
@@ -25,8 +25,6 @@ User input: "{prompt}"`;
 
 export async function POST(req: Request) {
   const { prompt } = await req.json();
-
-  const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
   const safetySettings = [
     {
@@ -49,8 +47,9 @@ export async function POST(req: Request) {
 
   const fullPrompt = promptTemplate.replace("{prompt}", prompt);
 
-  const streamingResponse = await model.generateContentStream({
-    contents: [{ role: "user", parts: [{ text: fullPrompt }] }],
+  const streamingResponse = await genAI.models.generateContentStream({
+    model: "gemini-2.5-flash",
+    contents: fullPrompt,
     safetySettings,
   });
 

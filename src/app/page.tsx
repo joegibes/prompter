@@ -91,8 +91,9 @@ export default function HomePage() {
         { src: data.imageUrl, prompt: finalPrompt },
         ...prevHistory,
       ]);
-    } catch (error: any) {
-      setGenerationError(error.message);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      setGenerationError(message);
     } finally {
       setIsGenerating(false);
     }
@@ -208,7 +209,7 @@ export default function HomePage() {
         animation={{ swipe: 0, fade: 0, scale: 0 }}
         carousel={{ finite: true }}
         render={{
-            slide: ({ slide, rect }) => (
+            slide: ({ slide }) => (
                 <div style={{ position: "relative", width: "100%", height: "100%" }}>
                     <img
                         src={slide.src}
