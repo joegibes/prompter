@@ -18,6 +18,11 @@ export const metadata: Metadata = {
   description: "Your creative partner for prompt engineering",
 };
 
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
