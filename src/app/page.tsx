@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
-import { useChat } from "ai/react";
+import { useEffect, useState, useRef, FormEvent, ChangeEvent } from "react";
 import {
   Card,
   CardContent,
@@ -29,11 +28,17 @@ interface HistoryItem {
   prompt: string;
 }
 
+interface Message {
+  id: number;
+  role: "user" | "assistant";
+  content: string;
+}
+
 export default function HomePage() {
   // Chat state
-  const { messages, setMessages, input, setInput, handleInputChange, handleSubmit, isLoading: isChatLoading } = useChat({
-    api: "/api/chat",
-  });
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [input, setInput] = useState("");
+  const [isChatLoading, setIsChatLoading] = useState(false);
   const [finalPrompt, setFinalPrompt] = useState("");
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
@@ -91,10 +96,46 @@ export default function HomePage() {
         { src: data.imageUrl, prompt: finalPrompt },
         ...prevHistory,
       ]);
-    } catch (error: any) {
-      setGenerationError(error.message);
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          setGenerationError(error.message);
+        } else {
+          setGenerationError("Failed to generate image.");
+        }
+      } finally {
+        setIsGenerating(false);
+      }
+    };
+
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setInput(e.target.value);
+  };
+
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const userMessage: Message = {
+      id: Date.now(),
+      role: "user",
+      content: input,
+    };
+    setMessages((prev) => [...prev, userMessage]);
+    setInput("");
+    setIsChatLoading(true);
+    try {
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt: userMessage.content }),
+      });
+      const data = await res.json();
+      const assistantMessage: Message = {
+        id: Date.now() + 1,
+        role: "assistant",
+        content: data.reply,
+      };
+      setMessages((prev) => [...prev, assistantMessage]);
     } finally {
-      setIsGenerating(false);
+      setIsChatLoading(false);
     }
   };
 
@@ -203,12 +244,12 @@ export default function HomePage() {
         open={lightboxIndex >= 0}
         close={() => setLightboxIndex(-1)}
         index={lightboxIndex}
-        slides={history.map(item => ({ src: item.src, title: item.prompt }))}
+        slides={history.map(item => ({ src: item.src }))}
         styles={{ container: { backgroundColor: "rgba(0, 0, 0, .9)" } }}
-        animation={{ swipe: 0, fade: 0, scale: 0 }}
+        animation={{ swipe: 0, fade: 0 }}
         carousel={{ finite: true }}
         render={{
-            slide: ({ slide, rect }) => (
+            slide: ({ slide }) => (
                 <div style={{ position: "relative", width: "100%", height: "100%" }}>
                     <img
                         src={slide.src}
@@ -235,7 +276,7 @@ export default function HomePage() {
                             padding: "10px"
                         }}
                     >
-                        {slide.title}
+                        {history[lightboxIndex]?.prompt}
                     </div>
                 </div>
             )
