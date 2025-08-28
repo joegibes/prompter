@@ -171,7 +171,7 @@ export default function HomePage() {
           }
         >
           <span style={captionTextStyle}>
-            {history[lightboxIndex]?.prompt}
+            {history[index]?.prompt}
           </span>
           {!isCaptionExpanded && (
             <>
