@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { GoogleGenerativeAI } from "@google/generative-ai";
-
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
+import { GoogleGenAI } from "@google/genai";
 
 export async function POST(req: NextRequest) {
   const { prompt, model: modelName } = await req.json();
@@ -23,32 +21,28 @@ export async function POST(req: NextRequest) {
 
   if (modelName === "gemini-2.5-flash-image-preview") {
     try {
-      const model = genAI.getGenerativeModel({ model: modelName });
-      const response = await model.generateContent(prompt);
-
-      // Based on the user's Python example, we need to find the inlineData part.
-      const firstCandidate = response.response.candidates?.[0];
-      const inlineDataPart = firstCandidate?.content?.parts?.find(
-        (part) => part.inlineData
-      )?.inlineData;
-
-      if (!inlineDataPart) {
-        throw new Error("No image data found in the response.");
+      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! });
+      const response = await ai.models.generateContent({
+        model: modelName,
+        contents: prompt,
+      });
+      for (const part of response.candidates?.[0]?.content?.parts || []) {
+        if (part.inlineData) {
+          const imageData = part.inlineData.data;
+          const mimeType = part.inlineData.mimeType;
+          const imageUrl = `data:${mimeType};base64,${imageData}`;
+          return NextResponse.json({ imageUrl });
+        }
       }
-
-      const imageBase64 = inlineDataPart.data;
-      const mimeType = inlineDataPart.mimeType;
-      const imageUrl = `data:${mimeType};base64,${imageBase64}`;
-
-      return NextResponse.json({ imageUrl });
-
-    } catch (error: any) {
-      console.error("Error generating image with Gemini:", error);
-      return NextResponse.json(
-        { error: "Failed to generate image.", details: error.message },
-        { status: 500 }
-      );
-    }
+      throw new Error("No image data found in the response.");
+      } catch (error: unknown) {
+        console.error("Error generating image with Gemini:", error);
+        const message = error instanceof Error ? error.message : "Unknown error";
+        return NextResponse.json(
+          { error: "Failed to generate image.", details: message },
+          { status: 500 }
+        );
+      }
   }
 
   return NextResponse.json(

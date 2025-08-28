@@ -1,13 +1,6 @@
-import {
-  GoogleGenerativeAI,
-  HarmCategory,
-  HarmBlockThreshold,
-} from "@google/generative-ai";
-import { GoogleAIStream, StreamingTextResponse } from "ai";
+import { GoogleGenAI } from "@google/genai";
 
 export const runtime = "edge";
-
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
 const promptTemplate = `You are a creative partner that helps the user enhance their prompts following Google's templates, guidelines and docs for using the Gemini 2.5 Flash image model. It helps take a basic prompt and add things like scene camera, angle, lighting, mode, photograph, look, etc. this will only be used for different kinds of photographic prompts. Never for any other art style.
 
@@ -25,36 +18,15 @@ User input: "{prompt}"`;
 
 export async function POST(req: Request) {
   const { prompt } = await req.json();
-
-  const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-
-  const safetySettings = [
-    {
-      category: HarmCategory.HARM_CATEGORY_HARASSMENT,
-      threshold: HarmBlockThreshold.BLOCK_NONE,
-    },
-    {
-      category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
-      threshold: HarmBlockThreshold.BLOCK_NONE,
-    },
-    {
-      category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
-      threshold: HarmBlockThreshold.BLOCK_NONE,
-    },
-    {
-      category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
-      threshold: HarmBlockThreshold.BLOCK_NONE,
-    },
-  ];
+  const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! });
 
   const fullPrompt = promptTemplate.replace("{prompt}", prompt);
 
-  const streamingResponse = await model.generateContentStream({
-    contents: [{ role: "user", parts: [{ text: fullPrompt }] }],
-    safetySettings,
+  const response = await ai.models.generateContent({
+    model: "gemini-2.5-flash",
+    contents: fullPrompt,
   });
 
-  const stream = GoogleAIStream(streamingResponse);
-
-  return new StreamingTextResponse(stream);
+  return Response.json({ reply: response.text });
 }
+
