@@ -59,6 +59,11 @@ const captionContainerStyle: CSSProperties = {
   position: "relative",
 };
 
+const collapsedCaptionContainerStyle: CSSProperties = {
+  ...captionContainerStyle,
+  maxHeight: "4.5em",
+};
+
 const captionTextStyle: CSSProperties = {
   whiteSpace: "pre-wrap",
 };
