@@ -22,6 +22,9 @@
     --input: 240 3.7% 15.9%;
     --ring: 34.9 91.6% 58.4%; /* Amber */
     --radius: 0.5rem;
+
+    --user-message: 240 4% 25%;
+    --user-message-foreground: 0 0% 98%;
   }
 
   .dark {

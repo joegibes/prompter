@@ -154,7 +154,7 @@ export default function HomePage() {
           <h1 className="text-2xl font-serif text-amber-400">
             Nano Banana Prompter
           </h1>
-          <Button variant="ghost" onClick={handleNewCreation}>
+          <Button variant="outline" onClick={handleNewCreation}>
             <PlusCircle className="mr-2 h-4 w-4" />
             New Creation
           </Button>
@@ -171,7 +171,7 @@ export default function HomePage() {
               <ScrollArea className="flex-grow p-4 border rounded-lg" ref={scrollAreaRef}>
                 {messages.length > 0 ? messages.map((m) => (
                   <div key={m.id} className={`flex mb-3 ${m.role === "user" ? "justify-end" : "justify-start"}`}>
-                    <div className={`p-3 rounded-lg max-w-md ${m.role === "user" ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground"}`}>
+                    <div className={`p-3 rounded-lg max-w-md ${m.role === "user" ? "bg-user-message text-user-message-foreground" : "bg-secondary text-secondary-foreground"}`}>
                       {m.content}
                     </div>
                   </div>
