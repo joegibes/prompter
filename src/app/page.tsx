@@ -30,6 +30,7 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Loader2, PlusCircle } from "lucide-react";
 import Lightbox from "yet-another-react-lightbox";
+import Zoom from "yet-another-react-lightbox/plugins/zoom";
 import "yet-another-react-lightbox/styles.css";
 
 const slideContainerStyle: CSSProperties = {
@@ -148,6 +149,46 @@ export default function HomePage() {
       }
     },
     [toggleCaption]
+  );
+
+  const renderSlide = useCallback(
+    ({ slide }: { slide: { src: string } }) => (
+      <div style={slideContainerStyle}>
+        <img
+          src={slide.src}
+          alt={history[lightboxIndex]?.prompt}
+          style={slideImageStyle}
+        />
+        <div
+          role="button"
+          tabIndex={0}
+          onClick={toggleCaption}
+          onKeyDown={handleCaptionKeyDown}
+          style={
+            isCaptionExpanded
+              ? captionContainerStyle
+              : collapsedCaptionContainerStyle
+          }
+        >
+          <span style={captionTextStyle}>
+            {history[lightboxIndex]?.prompt}
+          </span>
+          {!isCaptionExpanded && (
+            <>
+              <div style={captionGradientStyle} />
+              <span style={moreTextStyle}>more...</span>
+            </>
+          )}
+        </div>
+      </div>
+    ),
+    [
+      history,
+      lightboxIndex,
+      isCaptionExpanded,
+      toggleCaption,
+      handleCaptionKeyDown,
+    ]
   );
 
   const handleGenerateImage = async () => {
@@ -367,38 +408,8 @@ export default function HomePage() {
         styles={{ container: { backgroundColor: "rgba(0, 0, 0, .9)" } }}
         animation={{ swipe: 0, fade: 0 }}
         carousel={{ finite: true }}
-        render={{
-          slide: ({ slide }) => (
-            <div style={slideContainerStyle}>
-              <img
-                src={slide.src}
-                alt={history[lightboxIndex]?.prompt}
-                style={slideImageStyle}
-              />
-              <div
-                role="button"
-                tabIndex={0}
-                onClick={toggleCaption}
-                onKeyDown={handleCaptionKeyDown}
-                style={
-                  isCaptionExpanded
-                    ? captionContainerStyle
-                    : collapsedCaptionContainerStyle
-                }
-              >
-                <span style={captionTextStyle}>
-                  {history[lightboxIndex]?.prompt}
-                </span>
-                {!isCaptionExpanded && (
-                  <>
-                    <div style={captionGradientStyle} />
-                    <span style={moreTextStyle}>more...</span>
-                  </>
-                )}
-              </div>
-            </div>
-          ),
-        }}
+        render={{ slide: renderSlide }}
+        plugins={[Zoom]}
       />
     </>
   );
